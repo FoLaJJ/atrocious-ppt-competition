@@ -62,6 +62,10 @@ const router = createRouter({
           component: UserManagementView
         }
       ]
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/dashboard'
     }
   ]
 })

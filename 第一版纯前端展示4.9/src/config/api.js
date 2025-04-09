@@ -111,5 +111,34 @@ export const ipQueryApi = {
       query.name.includes(keyword) ||
       query.department.includes(keyword)
     )
+  },
+
+  queryIp: async (ip, startTime, endTime, userInfo) => {
+    await delay(500)
+    // 首先根据 IP 筛选
+    const ipMatches = mockData.ipQueries.filter(query => query.ip === ip)
+
+    if (ipMatches.length === 0) {
+      throw new Error('未找到该IP的查询记录')
+    }
+
+    // 如果有时间范围，则进一步筛选
+    if (startTime || endTime) {
+      const start = startTime ? new Date(startTime) : null
+      const end = endTime ? new Date(endTime) : null
+
+      const timeMatches = ipMatches.filter(query => {
+        const queryDate = new Date(query.queryTime)
+        return (!start || queryDate >= start) && (!end || queryDate <= end)
+      })
+
+      if (timeMatches.length === 0) {
+        throw new Error('在指定时间范围内未找到该IP的查询记录')
+      }
+
+      return timeMatches[0] // 返回第一个匹配的记录
+    }
+
+    return ipMatches[0] // 如果没有时间范围，返回第一个匹配的IP记录
   }
 }
