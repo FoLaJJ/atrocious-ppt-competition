@@ -1,8 +1,10 @@
 <template>
   <div class="dashboard">
-    <aside class="sidebar" :class="{ 'collapsed': isCollapsed }">
+    <div class="sidebar-overlay" v-if="!isCollapsed && !isHidden"></div>
+    <aside class="sidebar" :class="{ 'collapsed': isCollapsed, 'hidden': isHidden }">
       <div class="logo">
-        <h1>隐私计算系统</h1>
+        <h1>基于关键词匹配的</h1>
+        <h1>三方隐私计算系统</h1>
       </div>
 
       <nav class="nav-menu">
@@ -58,10 +60,10 @@
       </div>
     </aside>
 
-    <main class="main-content">
+    <main class="main-content" :class="{ 'expanded': isHidden }">
       <header class="header">
         <button @click="toggleSidebar" class="toggle-button">
-          <i :class="isCollapsed ? 'fas fa-bars' : 'fas fa-times'"></i>
+          <i :class="isHidden ? 'fas fa-bars' : 'fas fa-times'"></i>
         </button>
         <div class="header-title">
           <h2>{{ currentRouteTitle }}</h2>
@@ -82,6 +84,7 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const isCollapsed = ref(false)
+const isHidden = ref(false)
 const isIpGroupCollapsed = ref(true)
 const isResearchGroupCollapsed = ref(true)
 const currentUser = ref({})
@@ -98,7 +101,8 @@ const currentRouteTitle = computed(() => {
 })
 
 const toggleSidebar = () => {
-  isCollapsed.value = !isCollapsed.value
+  isHidden.value = !isHidden.value
+  isCollapsed.value = isHidden.value
 }
 
 const toggleGroup = (group) => {
@@ -126,70 +130,162 @@ onMounted(() => {
 .dashboard {
   display: flex;
   min-height: 100vh;
+  background: #f8f9fa;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 999;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.sidebar.collapsed + .main-content .sidebar-overlay {
+  left: 80px;
 }
 
 .sidebar {
-  width: 250px;
-  background: #2c3e50;
+  width: 280px;
+  background: linear-gradient(180deg, #1a2634 0%, #2c3e50 100%);
   color: white;
-  transition: width 0.3s;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  transform: translateX(0);
+  backdrop-filter: blur(10px);
 }
 
 .sidebar.collapsed {
-  width: 60px;
+  width: 80px;
+}
+
+.sidebar.hidden {
+  transform: translateX(-100%);
+  pointer-events: none;
 }
 
 .logo {
-  padding: 1rem;
+  padding: 1.2rem 1.5rem;
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(0, 102, 204, 0.1), rgba(0, 102, 204, 0));
+  z-index: 0;
 }
 
 .logo h1 {
-  font-size: 1.2rem;
-  margin: 0;
+  font-size: 1.3rem;
+  margin: 0.2rem 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background: linear-gradient(45deg, #ffffff, #a8c7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.logo h1:first-child {
+  font-size: 1.3rem;
+  opacity: 0.95;
+  margin-bottom: 0.1rem;
 }
 
 .nav-menu {
   flex: 1;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
   overflow-y: auto;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.8rem 1.5rem;
-  color: white;
+  padding: 1rem 1.5rem;
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  transform: translateX(5px);
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(to bottom, #0066cc, #0099ff);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-item:hover::before {
+  transform: scaleY(1);
 }
 
 .nav-item i {
   margin-right: 1rem;
   width: 20px;
   text-align: center;
+  font-size: 1.1rem;
+  color: #0066cc;
 }
 
 .nav-group-title {
   display: flex;
   align-items: center;
-  padding: 0.8rem 1.5rem;
+  padding: 1rem 1.5rem;
   cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.nav-group-title:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
 }
 
 .nav-group-title i {
   margin-right: 1rem;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
+  color: #0066cc;
 }
 
 .nav-group-title i.rotated {
@@ -199,7 +295,8 @@ onMounted(() => {
 .sub-items {
   overflow: hidden;
   max-height: 0;
-  transition: max-height 0.3s;
+  transition: max-height 0.3s ease;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .sub-items:not(.collapsed) {
@@ -207,105 +304,140 @@ onMounted(() => {
 }
 
 .sub-item {
-  padding-left: 2.5rem;
+  padding-left: 3rem;
+  font-size: 0.95rem;
 }
 
 .user-info {
-  padding: 1rem;
+  padding: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+  backdrop-filter: blur(5px);
 }
 
 .user-details {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.user-details:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
 }
 
 .user-details i {
   margin-right: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  color: #0066cc;
 }
 
 .logout-button {
   width: 100%;
-  padding: 0.5rem;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.8rem;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.2);
   color: white;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .logout-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 71, 87, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
 }
 
 .logout-button i {
   margin-right: 0.5rem;
+  color: #ff4757;
 }
 
 .main-content {
-  flex: 1;
-  background: #f5f6fa;
+  position: absolute;
+  left: 280px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #f8f9fa;
   display: flex;
   flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.main-content.expanded {
+  left: 0;
 }
 
 .header {
   background: white;
-  padding: 1rem;
+  padding: 1.2rem;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .toggle-button {
   background: none;
   border: none;
   color: #2c3e50;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   cursor: pointer;
   padding: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+  color: #0066cc;
+  transform: scale(1.1);
 }
 
 .header-title {
-  margin-left: 1rem;
+  margin-left: 1.5rem;
 }
 
 .header-title h2 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: #2c3e50;
+  font-weight: 600;
 }
 
 .content {
   flex: 1;
-  padding: 1.5rem;
+  padding: 2rem;
   overflow-y: auto;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 1000;
-  }
-
-  .main-content {
-    margin-left: 250px;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
   }
 
   .sidebar.collapsed {
-    width: 0;
+    transform: translateX(-100%);
   }
 
-  .sidebar.collapsed + .main-content {
+  .main-content {
     margin-left: 0;
   }
 }
