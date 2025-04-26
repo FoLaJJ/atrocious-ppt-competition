@@ -2,21 +2,10 @@
   <div class="dashboard">
     <aside class="sidebar" :class="{ 'collapsed': isCollapsed }">
       <div class="logo">
-<!--         <h1>CloakGuard-Tripartite Private Keyword Retrieval</h1>-->
-        <h1>基于关键词匹配的三方隐私信息检索系统</h1>
+        <h1>隐私计算系统</h1>
       </div>
 
       <nav class="nav-menu">
-        <router-link to="/dashboard/principle" class="nav-item">
-          <i class="fas fa-lightbulb"></i>
-          <span>隐私计算流程</span>
-        </router-link>
-
-        <router-link to="/dashboard/principle-section" class="nav-item">
-          <i class="fas fa-circle-info"></i>
-          <span>核心技术支撑</span>
-        </router-link>
-        
         <div class="nav-group">
           <div class="nav-group-title" @click="toggleGroup('ip')">
             <i class="fas fa-chevron-down" :class="{ 'rotated': !isIpGroupCollapsed }"></i>
@@ -37,12 +26,12 @@
         <div class="nav-group">
           <div class="nav-group-title" @click="toggleGroup('research')">
             <i class="fas fa-chevron-down" :class="{ 'rotated': !isResearchGroupCollapsed }"></i>
-            <span>医疗数据查询</span>
+            <span>患者隐私查询</span>
           </div>
           <div class="sub-items" :class="{ 'collapsed': isResearchGroupCollapsed }">
             <router-link to="/dashboard/research-data" class="nav-item sub-item">
               <i class="fas fa-database"></i>
-              <span>医疗数据信息查询</span>
+              <span>患者隐私信息查询</span>
             </router-link>
             <router-link to="/dashboard/research-history" class="nav-item sub-item">
               <i class="fas fa-history"></i>
@@ -74,6 +63,9 @@
         <button @click="toggleSidebar" class="toggle-button">
           <i :class="isCollapsed ? 'fas fa-bars' : 'fas fa-times'"></i>
         </button>
+        <div class="header-title">
+          <h2>{{ currentRouteTitle }}</h2>
+        </div>
       </header>
 
       <div class="content">
@@ -84,20 +76,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const isCollapsed = ref(false)
 const isIpGroupCollapsed = ref(true)
 const isResearchGroupCollapsed = ref(true)
 const currentUser = ref({})
 
-onMounted(() => {
-  const userStr = localStorage.getItem('user')
-  if (userStr) {
-    currentUser.value = JSON.parse(userStr)
+const currentRouteTitle = computed(() => {
+  const routeMap = {
+    'ipQuery': 'IP归属查询',
+    'ipHistory': 'IP查询历史',
+    'researchData': '患者隐私信息查询',
+    'researchHistory': '患者查询历史',
+    'userManagement': '用户管理'
   }
+  return routeMap[route.name] || '隐私计算系统'
 })
 
 const toggleSidebar = () => {
@@ -116,6 +113,13 @@ const handleLogout = () => {
   localStorage.removeItem('user')
   router.push('/login')
 }
+
+onMounted(() => {
+  const userStr = localStorage.getItem('user')
+  if (userStr) {
+    currentUser.value = JSON.parse(userStr)
+  }
+})
 </script>
 
 <style scoped>
@@ -128,79 +132,33 @@ const handleLogout = () => {
   width: 250px;
   background: #2c3e50;
   color: white;
+  transition: width 0.3s;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
-  position: fixed;
-  height: 100vh;
-  z-index: 1000;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar.collapsed {
-  width: 0;
-  transform: translateX(-100%);
-  overflow: hidden;
-  pointer-events: none;
+  width: 60px;
 }
 
 .logo {
-  padding: 1.5rem;
+  padding: 1rem;
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  white-space: normal;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.1);
 }
 
 .logo h1 {
+  font-size: 1.2rem;
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.4;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-  letter-spacing: 0.3px;
-  padding: 0 0.5rem;
-  word-break: break-word;
-}
-
-.logo p {
-  margin: 0.5rem 0 0;
-  font-size: 0.85rem;
-  opacity: 0.85;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.4;
-  padding: 0 0.5rem;
-  word-break: break-word;
-}
-
-.sidebar.collapsed .logo h1,
-.sidebar.collapsed .logo p,
-.sidebar.collapsed .nav-item span,
-.sidebar.collapsed .nav-group-title span,
-.sidebar.collapsed .user-details span,
-.sidebar.collapsed .logout-button span {
-  display: none;
-}
-
-.sidebar.collapsed .nav-item,
-.sidebar.collapsed .nav-group-title,
-.sidebar.collapsed .user-details,
-.sidebar.collapsed .logout-button {
-  padding: 0.8rem;
-  justify-content: center;
-}
-
-.sidebar.collapsed .nav-item i,
-.sidebar.collapsed .nav-group-title i,
-.sidebar.collapsed .user-details i,
-.sidebar.collapsed .logout-button i {
-  margin-right: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-menu {
   flex: 1;
   padding: 1rem 0;
+  overflow-y: auto;
 }
 
 .nav-item {
@@ -209,24 +167,17 @@ const handleLogout = () => {
   padding: 0.8rem 1.5rem;
   color: white;
   text-decoration: none;
-  transition: background-color 0.3s ease;
+  transition: background 0.3s;
 }
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.nav-item.router-link-active {
-  background: rgba(255, 255, 255, 0.2);
-}
-
 .nav-item i {
+  margin-right: 1rem;
   width: 20px;
-  margin-right: 10px;
-}
-
-.nav-group {
-  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .nav-group-title {
@@ -234,18 +185,11 @@ const handleLogout = () => {
   align-items: center;
   padding: 0.8rem 1.5rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-bottom: 0.2rem;
-}
-
-.nav-group-title:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-group-title i {
-  width: 20px;
-  margin-right: 10px;
-  transition: transform 0.3s ease;
+  margin-right: 1rem;
+  transition: transform 0.3s;
 }
 
 .nav-group-title i.rotated {
@@ -253,135 +197,112 @@ const handleLogout = () => {
 }
 
 .sub-items {
-  transition: max-height 0.3s ease-in-out;
-  max-height: 200px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 0 0 4px 4px;
+  max-height: 0;
+  transition: max-height 0.3s;
 }
 
-.sub-items.collapsed {
-  max-height: 0;
+.sub-items:not(.collapsed) {
+  max-height: 500px;
 }
 
 .sub-item {
-  padding-left: 3rem;
-  margin: 0.1rem 0;
-  opacity: 0.9;
-}
-
-.sub-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.sub-item.router-link-active {
-  background: rgba(255, 255, 255, 0.08);
+  padding-left: 2.5rem;
 }
 
 .user-info {
-  padding: 1.2rem 1.5rem;
+  padding: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: left;
 }
 
 .user-details {
   display: flex;
   align-items: center;
-  margin-bottom: 0.8rem;
-  padding-left: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .user-details i {
-  margin-right: 0.8rem;
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.user-details span {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
+  margin-right: 1rem;
+  font-size: 1.5rem;
 }
 
 .logout-button {
-  width: 90%;
-  margin-left: 0.5rem;
-  padding: 0.6rem;
+  width: 100%;
+  padding: 0.5rem;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
+  color: white;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
+  transition: background 0.3s;
 }
 
 .logout-button:hover {
   background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .logout-button i {
-  margin-right: 0.6rem;
-  font-size: 0.9rem;
+  margin-right: 0.5rem;
 }
 
 .main-content {
   flex: 1;
   background: #f5f6fa;
-  margin-left: 250px;
-  transition: margin-left 0.3s ease;
-}
-
-.sidebar.collapsed + .main-content {
-  margin-left: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
   background: white;
   padding: 1rem;
+  display: flex;
+  align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .toggle-button {
-  background: transparent;
+  background: none;
   border: none;
-  font-size: 1.0rem;
+  color: #2c3e50;
+  font-size: 1.2rem;
   cursor: pointer;
+  padding: 0.5rem;
+}
+
+.header-title {
+  margin-left: 1rem;
+}
+
+.header-title h2 {
+  margin: 0;
+  font-size: 1.2rem;
   color: #2c3e50;
 }
 
-
 .content {
-  padding: 2rem;
-}
-
-
-.sidebar.collapsed .nav-menu,
-.sidebar.collapsed .user-info {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.sidebar.collapsed .logo {
-  opacity: 0;
-  visibility: hidden;
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
 }
 
 @media (max-width: 768px) {
   .sidebar {
-    transform: translateX(0);
-  }
-
-  .sidebar.collapsed {
-    transform: translateX(-190px);
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
   }
 
   .main-content {
-    margin-left: 0;
+    margin-left: 250px;
+  }
+
+  .sidebar.collapsed {
+    width: 0;
   }
 
   .sidebar.collapsed + .main-content {

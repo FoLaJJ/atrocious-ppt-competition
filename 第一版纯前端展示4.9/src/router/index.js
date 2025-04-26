@@ -8,13 +8,15 @@ import ResearchDataView from "@/views/ResearchDataView.vue";
 import ResearchHistoryView from "@/views/ResearchHistoryView.vue";
 import UserManagementView from "@/views/UserManagementView.vue";
 import PrincipleSectionView from "@/views/PrincipleSectionView.vue";
+import LandingPage from "@/views/LandingPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      name: 'landing',
+      component: LandingPage
     },
     {
       path: '/login',
@@ -25,6 +27,7 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: DashboardView,
+      meta: { requiresAuth: true },
       children: [
         {
           path: 'principle',
@@ -65,7 +68,7 @@ const router = createRouter({
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/dashboard'
+      redirect: '/'
     }
   ]
 })
@@ -73,7 +76,7 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('user')
-  if (to.path !== '/login' && !isAuthenticated) {
+  if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
   } else {
     next()
