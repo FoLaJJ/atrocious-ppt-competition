@@ -60,7 +60,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="query in searchResults" :key="query.id">
+          <tr
+            v-for="query in searchResults"
+            :key="query.id"
+            @click="handleRowClick(query.id)"
+            class="clickable-row"
+          >
             <td>{{ query.patientName }}</td>
             <td>{{ query.disease }}</td>
             <td>{{ query.startTime }} - {{ query.endTime }}</td>
@@ -87,8 +92,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import mockData from '../../mock/data.json'
 
+const router = useRouter()
 const hospitalQueries = ref([])
 const searchResults = ref([])
 const searchPatientName = ref('')
@@ -134,6 +141,13 @@ const handleSearch = () => {
   }
 
   searchResults.value = results
+}
+
+const handleRowClick = (id) => {
+  router.push({
+    path: `/dashboard/query-detail/${id}`,
+    query: { type: 'hospital' }
+  })
 }
 
 onMounted(() => {
@@ -260,6 +274,15 @@ th {
 
 tr:hover {
   background-color: #f8f9fa;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f0f7ff;
 }
 
 .status {

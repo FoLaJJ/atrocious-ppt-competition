@@ -60,7 +60,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr
+              class="clickable-row"
+              @click="handleRowClick(queryResult.id)"
+            >
               <td>{{ queryResult.ip }}</td>
               <td>{{ formatTimeRange(queryResult.startTime, queryResult.endTime) }}</td>
               <td>{{ queryResult.queryTime }}</td>
@@ -84,9 +87,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { ipQueryApi } from '../config/api'
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {ipQueryApi} from '@/config/api'
 
+const router = useRouter()
 const form = ref({
   ip: '',
   startTime: '',
@@ -111,23 +116,28 @@ const handleQuery = async () => {
     const userStr = localStorage.getItem('user')
     const user = JSON.parse(userStr)
 
-    const result = await ipQueryApi.queryIp(
-      form.value.ip,
-      form.value.startTime,
-      form.value.endTime,
-      {
-        name: user.name,
-        department: user.department,
-        phone: user.phone
-      }
+    queryResult.value = await ipQueryApi.queryIp(
+        form.value.ip,
+        form.value.startTime,
+        form.value.endTime,
+        {
+          name: user.name,
+          department: user.department,
+          phone: user.phone
+        }
     )
-
-    queryResult.value = result
   } catch (error) {
     console.error('查询失败:', error)
   } finally {
     loading.value = false
   }
+}
+
+const handleRowClick = (id) => {
+  router.push({
+    path: `/dashboard/query-detail/${id}`,
+    query: { type: 'ip' }
+  })
 }
 
 const formatTimeRange = (start, end) => {
@@ -274,28 +284,29 @@ td {
   color: #666;
 }
 
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f0f7ff;
+}
+
 .status-badge {
-  padding: 0.25rem 0.5rem;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.875rem;
-  display: inline-block;
-  min-width: 60px;
-  text-align: center;
+  font-size: 0.9em;
 }
 
 .status-badge.success {
-  background: #d4edda;
-  color: #155724;
+  background-color: #e3fcef;
+  color: #00a854;
 }
 
 .status-badge.pending {
-  background: #fff3cd;
-  color: #856404;
-}
-
-/* 添加表格行的悬停效果 */
-tbody tr:hover {
-  background-color: #f8f9fa;
+  background-color: #fff7e6;
+  color: #fa8c16;
 }
 
 @media (max-width: 768px) {

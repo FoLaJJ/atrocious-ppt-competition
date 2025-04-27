@@ -15,7 +15,7 @@
     </nav>
 
     <!-- 区域 -->
-    <section class="hero">
+    <section class="hero fade-in">
       <div class="hero-content">
         <h2>安全、高效、可信的隐私计算解决方案</h2>
         <p>基于多方隐私计算技术，实现数据"可用不可见"</p>
@@ -27,10 +27,10 @@
     </section>
 
     <!-- 产品优势 -->
-    <section id="product" class="features">
+    <section id="product" class="features fade-in">
       <h2>产品优势</h2>
       <div class="feature-grid">
-        <div class="feature-card">
+        <div class="feature-card fade-in-scale">
           <div class="feature-icon">
             <i class="fas fa-shield-alt"></i>
           </div>
@@ -42,7 +42,7 @@
             <li>通过多方安全计算协议，确保计算过程的安全性</li>
           </ul>
         </div>
-        <div class="feature-card">
+        <div class="feature-card fade-in-scale">
           <div class="feature-icon">
             <i class="fas fa-bolt"></i>
           </div>
@@ -54,7 +54,7 @@
             <li>支持分布式部署，实现弹性扩展</li>
           </ul>
         </div>
-        <div class="feature-card">
+        <div class="feature-card fade-in-scale">
           <div class="feature-icon">
             <i class="fas fa-handshake"></i>
           </div>
@@ -68,13 +68,12 @@
         </div>
       </div>
     </section>
-
-    <!-- 核心技术 -->
-    <section id="tech" class="tech-section">
+        <!-- 核心技术 -->
+    <section id="tech" class="tech-section fade-in">
       <h2>核心技术</h2>
       <div class="tech-grid">
         <!-- 安全多方计算模型 -->
-        <div class="tech-card">
+        <div class="tech-card fade-in-scale">
           <div class="tech-visual">
             <div class="mpc-flow">
               <div class="participants">
@@ -98,7 +97,7 @@
         </div>
 
         <!-- RSA盲签名 -->
-        <div class="tech-card">
+        <div class="tech-card fade-in-scale">
           <div class="tech-visual">
             <div class="blind-sign-flow">
               <div class="message-box">
@@ -128,7 +127,7 @@
         </div>
 
         <!-- 不经意传输 -->
-        <div class="tech-card">
+        <div class="tech-card fade-in-scale">
           <div class="tech-visual">
             <div class="ot-flow">
               <div class="sender">
@@ -156,9 +155,8 @@
             </ul>
           </div>
         </div>
-
-        <!-- OPRF -->
-        <div class="tech-card">
+                <!-- OPRF -->
+        <div class="tech-card fade-in-scale">
           <div class="tech-visual">
             <div class="oprf-flow">
               <div class="input">
@@ -190,7 +188,7 @@
         </div>
 
         <!-- PSI-Payload -->
-        <div class="tech-card">
+        <div class="tech-card fade-in-scale">
           <div class="tech-visual">
             <div class="psi-payload-flow">
               <div class="set-a">
@@ -221,7 +219,7 @@
         </div>
 
         <!-- 隐私集合求交 -->
-        <div class="tech-card">
+        <div class="tech-card fade-in-scale">
           <div class="tech-visual">
             <div class="psi-flow">
               <div class="set-a">
@@ -252,9 +250,8 @@
         </div>
       </div>
     </section>
-
-    <!-- 技术流程 -->
-    <section id="workflow" class="workflow">
+        <!-- 技术流程 -->
+    <section id="workflow" class="workflow fade-in">
       <h2>技术流程</h2>
       <div class="workflow-container">
          <div class="flow-chart">
@@ -357,12 +354,11 @@
     </div>
       </div>
     </section>
-
-    <!-- 应用场景 -->
-    <section class="use-cases">
+        <!-- 应用场景 -->
+    <section class="use-cases fade-in">
       <h2>应用场景</h2>
       <div class="use-cases-grid">
-        <div class="use-case-card">
+        <div class="use-case-card fade-in-scale">
           <div class="use-case-icon">
             <i class="fas fa-hospital"></i>
           </div>
@@ -375,7 +371,7 @@
             <li>促进医疗科研合作</li>
           </ul>
         </div>
-        <div class="use-case-card">
+        <div class="use-case-card fade-in-scale">
           <div class="use-case-icon">
             <i class="fas fa-chart-line"></i>
           </div>
@@ -388,7 +384,7 @@
             <li>提升风控模型准确性</li>
           </ul>
         </div>
-        <div class="use-case-card">
+        <div class="use-case-card fade-in-scale">
           <div class="use-case-icon">
             <i class="fas fa-building"></i>
           </div>
@@ -405,7 +401,7 @@
     </section>
 
     <!-- 关于我们 -->
-    <section id="about" class="about">
+    <section id="about" class="about fade-in">
       <h2>关于我们</h2>
       <div class="about-content">
         <p>我们致力于提供创新型的隐私计算解决方案，帮助机构在保护数据隐私的同时实现数据价值。目前，我们已与所在高校和附属医院建立了合作关系，共同推动隐私计算技术在教育、医疗等领域的应用。</p>
@@ -444,22 +440,88 @@ const prevStep = () => {
 }
 
 onMounted(() => {
-  // 添加滚动动画效果
+  // 创建 IntersectionObserver 实例
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('animate')
+        // 如果是卡片容器，为其中的卡片添加延迟动画
+        if (entry.target.classList.contains('feature-grid') ||
+            entry.target.classList.contains('tech-grid') ||
+            entry.target.classList.contains('use-cases-grid')) {
+          const cards = entry.target.querySelectorAll('.fade-in-scale')
+          cards.forEach((card, index) => {
+            setTimeout(() => {
+              card.classList.add('animate')
+            }, index * 20) // 每个卡片延迟200ms
+          })
+        }
+        observer.unobserve(entry.target) // 只触发一次动画
       }
     })
+  }, {
+    threshold: 0.1, // 当元素10%进入视口时触发
+    rootMargin: '0px 0px -100px 0px' // 提前100px触发
   })
 
-  document.querySelectorAll('.feature-card, .tech-card, .step, .use-case-card, .principle-card').forEach(el => {
+  // 观察所有需要动画的元素
+  document.querySelectorAll('.fade-in, .fade-in-scale').forEach(el => {
     observer.observe(el)
   })
 })
 </script>
-
 <style scoped>
+/* 添加新的动画关键帧 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 添加淡入动画类 */
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: none;
+}
+
+.fade-in.animate {
+  animation: fadeIn 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.fade-in-scale {
+  opacity: 0;
+  transform: scale(0.95) translateY(20px);
+  transition: none;
+}
+
+.fade-in-scale.animate {
+  animation: fadeInScale 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* 为不同区域添加动画延迟 */
+#product.fade-in.animate { animation-delay: 0.2s; }
+#tech.fade-in.animate { animation-delay: 0.4s; }
+#workflow.fade-in.animate { animation-delay: 0.4s; }
+.use-cases.fade-in.animate { animation-delay: 0.4s; }
+#about.fade-in.animate { animation-delay: 0.4s; }
+
 .landing-page {
   font-family: 'Arial', sans-serif;
 }
@@ -576,19 +638,8 @@ onMounted(() => {
 .hero-content {
   opacity: 0;
   transform: translateY(30px);
-  animation: fadeInUp 1s ease forwards;
+  animation: fadeIn 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
   animation-delay: 0.5s;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .hero-content h2 {
@@ -1166,4 +1217,4 @@ onMounted(() => {
     gap: 2rem;
   }
 }
-</style> 
+</style>

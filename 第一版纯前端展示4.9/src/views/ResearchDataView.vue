@@ -70,7 +70,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="result in queryResults" :key="result.id">
+            <tr
+              v-for="result in queryResults"
+              :key="result.id"
+              @click="handleRowClick(result.id)"
+              class="clickable-row"
+            >
               <td>{{ result.patientName }}</td>
               <td>{{ result.disease }}</td>
               <td>{{ formatTimeRange(result.startTime, result.endTime) }}</td>
@@ -98,8 +103,10 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import mockData from '../../mock/data.json'
 
+const router = useRouter()
 const form = ref({
   patientName: '',
   disease: '',
@@ -164,6 +171,13 @@ const handleQuery = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleRowClick = (id) => {
+  router.push({
+    path: `/dashboard/query-detail/${id}`,
+    query: { type: 'hospital' }
+  })
 }
 
 const formatTimeRange = (start, end) => {
@@ -298,35 +312,37 @@ td {
   color: #666;
 }
 
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f0f7ff;
+}
+
 .status-badge {
-  padding: 0.25rem 0.5rem;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.875rem;
-  display: inline-block;
-  min-width: 60px;
-  text-align: center;
+  font-size: 0.9em;
 }
 
 .status-badge.success {
-  background: #d4edda;
-  color: #155724;
+  background-color: #e3fcef;
+  color: #00a854;
 }
 
 .status-badge.pending {
-  background: #fff3cd;
-  color: #856404;
-}
-
-tbody tr:hover {
-  background-color: #f8f9fa;
+  background-color: #fff7e6;
+  color: #fa8c16;
 }
 
 .no-results {
-  background: white;
+  text-align: center;
   padding: 2rem;
+  background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
   color: #666;
 }
 

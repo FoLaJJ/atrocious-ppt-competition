@@ -1,20 +1,23 @@
 {
-    "name": "mpc-frontend",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-      "dev": "vite",
-      "build": "vite build",
-      "preview": "vite preview"
-    },
-    "dependencies": {
-      "vue": "^3.3.4",
-      "vue-router": "^4.2.4",
-      "@fortawesome/fontawesome-free": "^6.4.2"
-    },
-    "devDependencies": {
-      "@vitejs/plugin-vue": "^4.2.3",
-      "vite": "^4.4.9"
-    }
+  "name": "mpc-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
+    "@fortawesome/fontawesome-free": "^6.4.2",
+    "element-plus": "^2.9.8",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "unplugin-auto-import": "^0.16.6",
+    "unplugin-vue-components": "^0.25.1",
+    "vite": "^6.3.3"
   }
-  
+}

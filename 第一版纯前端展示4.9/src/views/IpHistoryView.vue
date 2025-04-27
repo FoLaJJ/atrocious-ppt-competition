@@ -49,7 +49,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="query in filteredQueries" :key="query.id">
+          <tr
+            v-for="query in filteredQueries"
+            :key="query.id"
+            @click="handleRowClick(query.id)"
+            class="clickable-row"
+          >
             <td>{{ query.ip }}</td>
             <td>{{ query.startTime }} - {{ query.endTime }}</td>
             <td>{{ query.queryTime }}</td>
@@ -73,7 +78,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const ipQueries = ref([])
 const searchKeyword = ref('')
 const startTime = ref('')
@@ -108,6 +115,13 @@ const handleSearch = () => {
   }
 
   searchResults.value = result
+}
+
+const handleRowClick = (id) => {
+  router.push({
+    path: `/dashboard/query-detail/${id}`,
+    query: { type: 'ip' }
+  })
 }
 
 onMounted(async () => {
@@ -239,5 +253,14 @@ tr:hover {
 .status.processing {
   background-color: #fff7e6;
   color: #fa8c16;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f0f7ff;
 }
 </style> 
