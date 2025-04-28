@@ -144,9 +144,17 @@ const handleSearch = () => {
 }
 
 const handleRowClick = (id) => {
+  const query = hospitalQueries.value.find(q => q.id === id)
+  console.log('Navigating to detail with:', {
+    id,
+    type: 'hospital',
+    data: query
+  })
   router.push({
     path: `/dashboard/query-detail/${id}`,
-    query: { type: 'hospital' }
+    query: {
+      type: 'hospital'
+    }
   })
 }
 

@@ -71,16 +71,32 @@
         <h3>隐私计算详情</h3>
         <div class="data-section">
           <div class="data-box">
-            <div class="data-title">加密数据</div>
+            <div class="data-title">请求数据</div>
             <div class="data-content">
-              <template v-if="detail.type === 'ip' && encryptedData.encrypt_ip">
-                {{ encryptedData.encrypt_ip }}
-              </template>
-              <template v-else-if="detail.type === 'hospital' && encryptedData.encrypt_patient">
-                {{ encryptedData.encrypt_patient }}
+              <template v-if="encryptedData.encrypt_ip">
+                <div class="data-item">
+                  <span class="data-label">加密IP:</span>
+                  <span class="data-value">{{ encryptedData.encrypt_ip }}</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">服务器开始时间:</span>
+                  <span class="data-value">{{ encryptedData.server_start_time }}</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">服务器结束时间:</span>
+                  <span class="data-value">{{ encryptedData.server_end_time }}</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">MOD:</span>
+                  <span class="data-value">{{ encryptedData.MOD }}</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Hash IP:</span>
+                  <span class="data-value">{{ encryptedData.hash_ip }}</span>
+                </div>
               </template>
               <template v-else>
-                <el-empty description="暂无加密数据" />
+                <el-empty description="暂无请求数据" />
               </template>
             </div>
           </div>
@@ -89,36 +105,17 @@
             <div class="data-title">RSA公钥</div>
             <div class="data-content">
               <template v-if="encryptedData.rsa_public_key">
-                <div class="key-item">
-                  <span class="key-label">n:</span>
-                  <span class="key-value">{{ encryptedData.rsa_public_key.n }}</span>
+                <div class="data-item">
+                  <span class="data-label">n:</span>
+                  <span class="data-value">{{ encryptedData.rsa_public_key.n }}</span>
                 </div>
-                <div class="key-item">
-                  <span class="key-label">e:</span>
-                  <span class="key-value">{{ encryptedData.rsa_public_key.e }}</span>
+                <div class="data-item">
+                  <span class="data-label">e:</span>
+                  <span class="data-value">{{ encryptedData.rsa_public_key.e }}</span>
                 </div>
               </template>
               <template v-else>
                 <el-empty description="暂无RSA公钥数据" />
-              </template>
-            </div>
-          </div>
-
-          <div class="data-box">
-            <div class="data-title">OT协议数据</div>
-            <div class="data-content">
-              <template v-if="encryptedData.ot_data">
-                <div class="ot-item">
-                  <span class="ot-label">Base64加密:</span>
-                  <span class="ot-value">{{ encryptedData.ot_data.b64_encrypt }}</span>
-                </div>
-                <div class="ot-item">
-                  <span class="ot-label">加密数据:</span>
-                  <span class="ot-value">{{ encryptedData.ot_data.encrypt }}</span>
-                </div>
-              </template>
-              <template v-else>
-                <el-empty description="暂无OT协议数据" />
               </template>
             </div>
           </div>
@@ -131,8 +128,19 @@
           <div class="data-box">
             <div class="data-title">混淆索引集合</div>
             <div class="data-content">
-              <template v-if="detail.obfuscatedIndices">
-                {{ detail.obfuscatedIndices }}
+              <template v-if="encryptedData.trueIndex !== undefined">
+                <div class="data-item">
+                  <span class="data-label">真实索引:</span>
+                  <span class="data-value">{{ encryptedData.trueIndex }}</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">混淆列表:</span>
+                  <div class="obfuscated-list">
+                    <span v-for="(item, index) in encryptedData.obfuscatedList" :key="index">
+                      {{ item[0] }}<span v-if="index < encryptedData.obfuscatedList.length - 1">, </span>
+                    </span>
+                  </div>
+                </div>
               </template>
               <template v-else>
                 <el-empty description="暂无混淆索引数据" />
@@ -141,22 +149,13 @@
           </div>
 
           <div class="data-box">
-            <div class="data-title">真实索引位置</div>
-            <div class="data-content">
-              <template v-if="detail.realIndexPosition !== undefined">
-                {{ detail.realIndexPosition }}
-              </template>
-              <template v-else>
-                <el-empty description="暂无索引位置数据" />
-              </template>
-            </div>
-          </div>
-
-          <div class="data-box">
             <div class="data-title">OT协议数据</div>
             <div class="data-content">
-              <template v-if="detail.otProtocolData">
-                {{ detail.otProtocolData }}
+              <template v-if="encryptedData.encrypt_OT_dataSource_want">
+                <div class="data-item">
+                  <span class="data-label">加密数据:</span>
+                  <span class="data-value">{{ encryptedData.encrypt_OT_dataSource_want }}</span>
+                </div>
               </template>
               <template v-else>
                 <el-empty description="暂无OT协议数据" />
@@ -185,11 +184,15 @@ onMounted(async () => {
   loading.value = true
   try {
     const id = route.params.id
-    const queryType = route.query.type
-    const data = await getQueryDetail(id)
+    console.log('Route state:', route.state)
+    console.log('Route query:', route.query)
 
-    // 设置查询类型
-    data.type = queryType || 'ip'
+    // 直接从 API 获取数据，使用 query 参数中的 type
+    const type = route.query.type || 'ip'
+    console.log('Fetching data with type:', type)
+    const data = await getQueryDetail(id, type)
+
+    console.log('Final data:', data)
     detail.value = data
 
     // 获取加密数据
@@ -288,21 +291,34 @@ h3 {
   border-radius: 4px;
 }
 
-.key-item,
-.ot-item {
-  margin-bottom: 8px;
+.data-item {
+  margin-bottom: 10px;
+  line-height: 1.5;
 }
 
-.key-label,
-.ot-label {
-  color: #909399;
-  margin-right: 8px;
+.data-label {
+  color: #606266;
   font-weight: bold;
+  margin-right: 8px;
 }
 
-.key-value,
-.ot-value {
+.data-value {
   color: #303133;
+  word-break: break-all;
+}
+
+.obfuscated-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.obfuscated-list span {
+  background-color: #f0f2f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
 }
 
 .no-data {

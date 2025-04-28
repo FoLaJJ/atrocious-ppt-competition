@@ -174,6 +174,7 @@ const handleQuery = async () => {
 }
 
 const handleRowClick = (id) => {
+  console.log('Navigating to detail with:', { id, type: 'hospital' })
   router.push({
     path: `/dashboard/query-detail/${id}`,
     query: { type: 'hospital' }

@@ -142,3 +142,38 @@ export const ipQueryApi = {
     return ipMatches[0] // 如果没有时间范围，返回第一个匹配的IP记录
   }
 }
+
+// 查询详情相关API
+export const getQueryDetail = async (id, type = 'ip') => {
+  await delay(500)
+  console.log('getQueryDetail called with:', { id, type })
+  let query = null
+
+  // 根据 type 决定查询顺序
+  if (type === 'hospital') {
+    console.log('Searching in hospital queries first')
+    query = mockData.hospitalQueries.find(q => q.id === parseInt(id))
+    if (!query) {
+      console.log('Not found in hospital queries, searching in IP queries')
+      query = mockData.ipQueries.find(q => q.id === parseInt(id))
+    }
+  } else {
+    console.log('Searching in IP queries first')
+    query = mockData.ipQueries.find(q => q.id === parseInt(id))
+    if (!query) {
+      console.log('Not found in IP queries, searching in hospital queries')
+      query = mockData.hospitalQueries.find(q => q.id === parseInt(id))
+    }
+  }
+
+  if (!query) {
+    console.log('Query not found in any collection')
+    throw new Error('查询记录不存在')
+  }
+
+  console.log('Found query:', query)
+  return {
+    ...query,
+    type
+  }
+}
